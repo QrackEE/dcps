@@ -10,10 +10,10 @@
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,7 +21,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
- 
+
 #-------------------------------------------------------------------------------
 #  Control a Rigol DP8xx family of DC Power Supplies with PyVISA
 #-------------------------------------------------------------------------------
@@ -34,13 +34,22 @@ from __future__ import print_function
 try:
     from . import SCPI
 except:
-    from SCPI import SCPI
-    
+    from SCPI import SCPI, _generate_methods
+
 from time import sleep
 import pyvisa as visa
 
+@_generate_methods
 class RigolDP800(SCPI):
     """Basic class for controlling and accessing a Rigol DP8xx Power Supply"""
+
+    _xlateCmdTbl = {
+        'isOutputTimer':     {'cmd': 'OUTput:TIMEr:STATe? {channel}', 'mode': 'query'},
+        'outputTimerOn':     {'cmd': 'OUTput:TIMEr:STATe {channel} ON', 'mode': 'write'},
+        'outputTimerOff':    {'cmd': 'OUTput:TIMEr:STATe {channel} OFF', 'mode': 'write'},
+        'queryOutputTimer':  {'cmd': 'OUTput:TIMEr? {channel}', 'mode': 'query'},
+        'setOutputTimer':    {'cmd': 'OUTput:TIMEr {channel} {secnum} {volt} {curr} {time}', 'mode': 'write'},
+    }
 
     def __init__(self, resource, wait=1.0, verbosity=0, **kwargs):
         """Init the class with the instruments resource string
@@ -52,7 +61,7 @@ class RigolDP800(SCPI):
         """
         super(RigolDP800, self).__init__(resource, max_chan=3, wait=wait, cmd_prefix=':', verbosity = verbosity, **kwargs)
 
-    
+
 
 if __name__ == '__main__':
     import argparse
@@ -68,18 +77,20 @@ if __name__ == '__main__':
 
     ## set Remote Lock On
     #rigol.setRemoteLock()
-    
+
     rigol.beeperOff()
-    
-    if not rigol.isOutputOn(args.chan):
+
+    if not rigol.isOutput(args.chan):
         rigol.outputOn()
-        
+
     print('Ch. {} Settings: {:6.4f} V  {:6.4f} A'.
               format(args.chan, rigol.queryVoltage(),
                          rigol.queryCurrent()))
 
+    print('Timer state: {}'.format(rigol.isOutputTimer(fmt=dict({'channel': 'CH1'}))))
+
     voltageSave = rigol.queryVoltage()
-    
+
     #print(rigol.idn())
     print('{:6.4f} V'.format(rigol.measureVoltage()))
     print('{:6.4f} A'.format(rigol.measureCurrent()))
@@ -106,5 +117,5 @@ if __name__ == '__main__':
 
     ## return to LOCAL mode
     rigol.setLocal()
-    
+
     rigol.close()
