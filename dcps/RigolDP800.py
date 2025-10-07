@@ -32,7 +32,7 @@ from __future__ import division
 from __future__ import print_function
 
 try:
-    from . import SCPI
+    from . import SCPI, _generate_methods
 except:
     from SCPI import SCPI, _generate_methods
 
@@ -44,11 +44,11 @@ class RigolDP800(SCPI):
     """Basic class for controlling and accessing a Rigol DP8xx Power Supply"""
 
     _xlateCmdTbl = {
-        'isOutputTimer':     {'cmd': 'OUTput:TIMEr:STATe? {channel}', 'mode': 'query'},
-        'outputTimerOn':     {'cmd': 'OUTput:TIMEr:STATe {channel} ON', 'mode': 'write'},
-        'outputTimerOff':    {'cmd': 'OUTput:TIMEr:STATe {channel} OFF', 'mode': 'write'},
-        'queryOutputTimer':  {'cmd': 'OUTput:TIMEr? {channel}', 'mode': 'query'},
-        'setOutputTimer':    {'cmd': 'OUTput:TIMEr {channel} {secnum} {volt} {curr} {time}', 'mode': 'write'},
+        'isOutputTimer':     {'cmd': 'OUTPut:TIMEr:STATe? {channel}', 'mode': 'query'},
+        'outputTimerOn':     {'cmd': 'OUTPut:TIMEr:STATe {channel},ON', 'mode': 'write'},
+        'outputTimerOff':    {'cmd': 'OUTPut:TIMEr:STATe {channel},OFF', 'mode': 'write'},
+        'queryOutputTimer':  {'cmd': 'OUTPut:TIMEr? {channel}', 'mode': 'query'},
+        'setOutputTimer':    {'cmd': 'OUTPut:TIMEr {channel},{secnum},{volt},{curr},{time}', 'mode': 'write'},
     }
 
     def __init__(self, resource, wait=1.0, verbosity=0, **kwargs):

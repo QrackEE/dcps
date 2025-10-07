@@ -1,8 +1,8 @@
 # Custom warnings
-from Warnings import NotImplemented
+from dcps.Warnings import NotImplemented
 
 # Standard SCPI commands
-from dcps.SCPI import SCPI
+from dcps.SCPI import SCPI, _generate_methods
 
 # Support of Rigol DP832A and other DP800 power supplies
 from dcps.RigolDP800 import RigolDP800

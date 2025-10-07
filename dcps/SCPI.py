@@ -49,7 +49,6 @@ def _generate_methods(cls):
         func_name = key
 
         def make_func(k):
-            print(f'Making function {func_name}')
             def method(self, channel=None, wait=None, fmt=None):
                 return self.command(k, channel=channel, wait=wait, fmt=fmt)
             method.__name__ = k
@@ -213,8 +212,6 @@ class SCPI(object):
         if fmt is not None:
             # Handle dict (named placeholders)
             while True:
-                print('loop')
-
                 if isinstance(fmt, dict):
                     try:
                         cmd = entry['cmd'].format(**fmt)
