@@ -244,12 +244,30 @@ class SCPI(object):
             result = self._instQuery(cmd)
             if 'callback' in entry:
                 result = entry['callback'](result)
-            return result
+        elif mode == 'query_binary':
+            result = self._inst.query_binary_values(cmd)
+        elif mode == 'read':
+            self._inst.write(cmd)
+            result = self._inst.read()
+        elif mode == 'read_binary_values':
+            self._inst.write(cmd)
+            result = self._inst.read_binary_values()
+        elif mode == 'read_bytes':
+            self._inst.write(cmd)
+            result = self._inst.read_bytes()
+        elif mode == 'read_raw':
+            self._inst.write(cmd)
+            result = self._inst.read_raw()
         elif mode == 'write':
             self._instWrite(cmd)
             sleep(wait)
+            return
         else:
             raise ValueError("Unexpected mode {}".format(mode))
+
+        if 'callback' in entry:
+            result = entry['callback'](result)
+        return result
 
     def close(self):
         """Close the VISA connection"""
@@ -344,6 +362,17 @@ class SCPI(object):
             return True
         else:
             return False
+
+    @staticmethod
+    def _screenshot_ieee488_2_header_trim(data):
+        if data is not None and data.startswith(b'#'):
+            # read the length of the header field (byte after '#' character)
+            length = int(chr(data[1]))
+            # data is hidden after header, skip it
+            header_size = 2 + length
+            data = data[header_size:]
+
+        return data
 
     def isGenericTrue(self, cmdStr, channel=None):
         """Return true if the result of cmdStr is ON, 1 or YES, else false

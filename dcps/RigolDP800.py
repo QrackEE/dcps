@@ -39,16 +39,22 @@ except:
 from time import sleep
 import pyvisa as visa
 
+
 @_generate_methods
 class RigolDP800(SCPI):
     """Basic class for controlling and accessing a Rigol DP8xx Power Supply"""
 
     _xlateCmdTbl = {
-        'isOutputTimer':     {'cmd': 'OUTPut:TIMEr:STATe? {channel}', 'mode': 'query'},
-        'outputTimerOn':     {'cmd': 'OUTPut:TIMEr:STATe {channel},ON', 'mode': 'write'},
-        'outputTimerOff':    {'cmd': 'OUTPut:TIMEr:STATe {channel},OFF', 'mode': 'write'},
-        'queryOutputTimer':  {'cmd': 'OUTPut:TIMEr? {channel}', 'mode': 'query'},
-        'setOutputTimer':    {'cmd': 'OUTPut:TIMEr {channel},{secnum},{volt},{curr},{time}', 'mode': 'write'},
+        'isOutputTimer':       {'cmd': 'OUTPut:TIMEr:STATe? {channel}', 'mode': 'query'},
+        'outputTimerOn':       {'cmd': 'OUTPut:TIMEr:STATe {channel},ON', 'mode': 'write'},
+        'outputTimerOff':      {'cmd': 'OUTPut:TIMEr:STATe {channel},OFF', 'mode': 'write'},
+        'queryOutputTimer':    {'cmd': 'OUTPut:TIMEr? {channel}', 'mode': 'query'},
+        'setOutputTimer':      {'cmd': 'OUTPut:TIMEr {channel},{secnum},{volt},{curr},{time}', 'mode': 'write'},
+        #! @todo timer spec is a semicolon separated list of CSVs, ie.
+        # "0,6.000,1.0000,10;1,1.000,1.0000,1;2,1.000,1.0000,1;3,1.000,1.0000,1;4,1.000,1.0000,1\n"
+        'queryTimerParameter': {'cmd': 'TIMEr:PARAmeter?', 'mode': 'query'},
+        #! @note thanks https://www.eevblog.com/forum/testgear/lists-of-rigol-scpi-commands/msg2460285/#msg2460285
+        'screenshot':          {'cmd': 'SYSTem:PRINT? BMP', 'mode': 'read_raw', 'callback': SCPI._screenshot_ieee488_2_header_trim},
     }
 
     def __init__(self, resource, wait=1.0, verbosity=0, **kwargs):
